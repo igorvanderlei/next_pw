@@ -1,24 +1,33 @@
 'use server'
+import { getAccessToken } from "@/utils/sessionTokenAccessor";
 
 export async function sayHello() {
     console.log("Hello")
 }
 
 export async function listarClientes() {
-    const clientesData = await fetch ('http://localhost:8080/cliente', { cache: 'no-store' });
-    const clientes = await clientesData.json();
-    return clientes;
+  let accessToken = await getAccessToken();
+
+  const clientesData = await fetch (`${process.env.DEMO_BACKEND_URL}` + '/cliente', 
+      { cache: 'no-store' ,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + accessToken,
+        },
+      });
+  const clientes = await clientesData.json();
+  return clientes;
 }
 
 export async function carregarCliente(id) {
-  const clienteData = await fetch ('http://localhost:8080/cliente/' + id, { cache: 'no-store' });
+  const clienteData = await fetch ('http://localhost:8081/cliente/' + id, { cache: 'no-store' });
   const cliente = await clienteData.json();
   return cliente;
 }
 
 export async function cadastrarCliente(formData) {
     try {
-      const response = await fetch('http://localhost:8080/cliente', {
+      const response = await fetch('http://localhost:8081/cliente', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
